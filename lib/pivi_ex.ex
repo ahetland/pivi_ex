@@ -57,13 +57,31 @@ defmodule PiviEx do
     _pivot(t, row, col, amount, stu)
   end
 
-  def head_as_list(%@me{} = me) do
-    head_list =  Map.keys(me.col_sum)
-    for head <- head_list do
-      Tuple.to_list(head)
-    end
+  defp empty_table_cells(%@me{} = me) do
+    hd(Map.keys(me.row_sum))
+    |> Tuple.to_list()
+    |> Enum.map(fn _ -> nil end)
   end
 
+  def head_as_list(%@me{} = me) do
+    head_list =  Map.keys(me.col_sum)
+    lst = 
+      for head <- head_list do
+        Tuple.to_list(head) |> hd
+      end
+
+    empty_table_cells(me) ++ lst ++ ["Total"]
+  end
+
+  def footer_as_list(%@me{} = me) do
+    head_list =  Map.keys(me.col_sum)
+    lst = 
+      for head <- head_list do
+        Map.get(me.col_sum, head, Decimal.new(0))
+      end
+    empty_table_cells(me) ++ lst ++ [me.total]
+  end
+    
   defp row_as_list(%@me{} = me, row) do
     head_list =  Map.keys(me.col_sum)
     lst = 
@@ -72,16 +90,20 @@ defmodule PiviEx do
       end
     #[row | lst ] ++ [Map.get(me.row_sum, row)]
     Tuple.to_list(row) ++ lst ++ [Map.get(me.row_sum, row)]
-
   end
 
-  def as_list(%@me{} = me) do
+  def elements_as_list(%@me{} = me) do
     row_list =  Map.keys(me.row_sum)
 
     for row <- row_list do
       row_as_list(me, row)
     end
   end
+
+  def as_list(%@me{} = me) do
+    [head_as_list(me)] ++ elements_as_list(me) ++ [footer_as_list(me)]
+  end
+
 
   def test(data) do
     data
