@@ -86,10 +86,21 @@ defmodule PiviEx do
     head_list =  Map.keys(me.col_sum)
     lst = 
       for head <- head_list do
-        Map.get(me.element, {row, head}, Decimal.new(0))
+        v = Map.get(me.element, {row, head}, Decimal.new(0))
       end
     #[row | lst ] ++ [Map.get(me.row_sum, row)]
     Tuple.to_list(row) ++ lst ++ [Map.get(me.row_sum, row)]
+  end
+
+  defp row_as_map(%@me{} = me, row) do
+    head_list =  Map.keys(me.col_sum)
+    lst = 
+      for head <- head_list do
+        v = Map.get(me.element, {row, head}, Decimal.new(0))
+        %{value: v, col: head, row: row}
+      end
+    #[row | lst ] ++ [Map.get(me.row_sum, row)]
+    Tuple.to_list(row) ++ lst ++ [%{val: Map.get(me.row_sum, row), row: row}]
   end
 
   def elements_as_list(%@me{} = me) do
@@ -100,10 +111,21 @@ defmodule PiviEx do
     end
   end
 
+  def elements_as_map(%@me{} = me) do
+    row_list =  Map.keys(me.row_sum)
+
+    for row <- row_list do
+      row_as_map(me, row)
+    end
+  end
+
   def as_list(%@me{} = me) do
     [head_as_list(me)] ++ elements_as_list(me) ++ [footer_as_list(me)]
   end
 
+  def as_map(%@me{} = me) do
+    [head_as_list(me)] ++ elements_as_map(me) ++ [footer_as_list(me)]
+  end
 
   def test(data) do
     data
