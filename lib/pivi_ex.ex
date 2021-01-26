@@ -49,7 +49,6 @@ defmodule PiviEx do
     row_h = row.(h)
     col_h = col.(h)
     amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
-    IO.inspect amount_h 
 
     calculate_element = 
       Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
