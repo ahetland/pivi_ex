@@ -48,9 +48,11 @@ defmodule PiviEx do
   defp _pivot([h | t], row, col, amount, stu) do
     row_h = row.(h)
     col_h = col.(h)
+    amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
+    IO.inspect amount_h 
 
     calculate_element = 
-      Map.update(stu.element, {row_h, col_h}, amount.(h), &(Decimal.add(&1, amount.(h))))
+      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
 
     stu = Map.put(stu, :element, calculate_element)
 
@@ -139,6 +141,7 @@ defmodule PiviEx do
     data = [
       %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-07-05], debit: Decimal.new(10), credit: Decimal.new(0)},
       %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], debit: 0, credit: Decimal.new(0)},
       %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
       %{company_id: 2, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
       %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
@@ -149,5 +152,22 @@ defmodule PiviEx do
     ]
     test(data)
   end
+  defp data do
+
+    data = [
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: nil},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+    ]
+  end
+  def test2() do
+    data
+    |> pivot(fn r -> {r.company_id, r.account_id} end,
+             fn r -> {Period.period(r.date)} end,
+             fn r -> r.amount end)
+  end
+    
+
 end
 
