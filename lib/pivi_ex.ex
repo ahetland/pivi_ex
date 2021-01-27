@@ -101,7 +101,7 @@ defmodule PiviEx do
         %{value: v, col: head, row: row}
       end
     #[row | lst ] ++ [Map.get(me.row_sum, row)]
-    Tuple.to_list(row) ++ lst ++ [%{value: Map.get(me.row_sum, row), row: row}]
+    lst ++ [%{value: Map.get(me.row_sum, row), row: row}]
   end
 
   def elements_as_list(%@me{} = me) do
@@ -125,7 +125,7 @@ defmodule PiviEx do
   end
 
   def as_map(%@me{} = me) do
-    [head_as_list(me)] ++ elements_as_map(me) ++ [footer_as_list(me)]
+    elements_as_map(me) ++ [footer_as_list(me)]
   end
 
   def test(data) do
