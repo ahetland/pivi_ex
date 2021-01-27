@@ -118,6 +118,7 @@ defmodule PiviEx do
     for row <- row_list do
       row_as_map(me, row)
     end
+    |> Enum.sort()
   end
 
   def as_list(%@me{} = me) do
