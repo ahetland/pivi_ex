@@ -31,8 +31,8 @@ defmodule PiviEx do
              fn r -> Decimal.sub(r.debit, r.credit) end)
   """
 
-  def pivot(%@me{data: data}, row, col, amount) do
-    pivot(data, row, col, amount)
+  def pivot(%@me{data: data} = pi, row, col, amount) do
+    _pivot(data, row, col, amount, pi)
   end
 
   def pivot(lst, row, col, amount) when is_list(lst) do
