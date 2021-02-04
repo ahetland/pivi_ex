@@ -4,6 +4,8 @@ defmodule PiviEx do
   Documentation for `PiviEx`.
 
   Creates a pivot table from a list.
+
+  The strcut holds its original data in the data attribute.
   """
 
   @me __MODULE__
@@ -11,6 +13,7 @@ defmodule PiviEx do
   alias PiviEx.Period
 
   defstruct(
+    data: nil,
     row_sum: %{},
     col_sum: %{},
     element: %{},
@@ -21,7 +24,18 @@ defmodule PiviEx do
   	%@me{}
   end
 
-  def pivot(lst, row, col, amount) do
+  @doc """
+    data
+    |> pivot(fn r -> {r.company_id, r.account_id} end,
+             fn r -> {Period.period(r.date)} end,
+             fn r -> Decimal.sub(r.debit, r.credit) end)
+  """
+
+  def pivot(%@me{data: data}, row, col, amount) do
+    pivot(data, row, col, amount)
+  end
+
+  def pivot(lst, row, col, amount) when is_list(lst) do
   	_pivot(lst, row, col, amount, new())
   end
 
@@ -87,7 +101,7 @@ defmodule PiviEx do
     head_list =  Map.keys(me.col_sum)
     lst = 
       for head <- head_list do
-        v = Map.get(me.element, {row, head}, Decimal.new(0))
+        Map.get(me.element, {row, head}, Decimal.new(0))
       end
     #[row | lst ] ++ [Map.get(me.row_sum, row)]
     Tuple.to_list(row) ++ lst ++ [Map.get(me.row_sum, row)]
@@ -153,8 +167,7 @@ defmodule PiviEx do
     test(data)
   end
   defp data do
-
-    data = [
+    [
       %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
       %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: nil},
       %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
@@ -162,7 +175,7 @@ defmodule PiviEx do
     ]
   end
   def test2() do
-    data
+    data()
     |> pivot(fn r -> {r.company_id, r.account_id} end,
              fn r -> {Period.period(r.date)} end,
              fn r -> r.amount end)
