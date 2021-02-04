@@ -20,8 +20,8 @@ defmodule PiviEx do
     total: nil
   )
 
-  def new do
-  	%@me{}
+  def new(data) do
+  	%@me{data: data}
   end
 
   @doc """
@@ -32,11 +32,11 @@ defmodule PiviEx do
   """
 
   def pivot(%@me{data: data} = pi, row, col, amount) do
-    _pivot(data, row, col, amount, pi)
+    _pivot(data, row, col, amount, new(data))
   end
 
   def pivot(lst, row, col, amount) when is_list(lst) do
-  	_pivot(lst, row, col, amount, new())
+  	_pivot(lst, row, col, amount, new(lst))
   end
 
   defp _pivot([], _row, _col, _amount, stu) do
