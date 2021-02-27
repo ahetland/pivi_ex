@@ -31,7 +31,7 @@ defmodule PiviEx do
              fn r -> Decimal.sub(r.debit, r.credit) end)
   """
 
-  def pivot(%@me{data: data} = pi, row, col, amount) do
+  def pivot(%@me{data: data} = _pi, row, col, amount) do
     _pivot(data, row, col, amount, new(data))
   end
 
@@ -78,14 +78,27 @@ defmodule PiviEx do
     |> Enum.map(fn _ -> nil end)
   end
 
+  @doc """
+  Returns the header for the calculated elements.
+  """
   def head_as_list(%@me{} = me) do
     head_list =  Map.keys(me.col_sum)
     lst = 
       for head <- head_list do
-        Tuple.to_list(head) |> hd
+        Tuple.to_list(head) |> Enum.join("-") 
       end
 
     empty_table_cells(me) ++ lst ++ ["Total"]
+  end
+
+  def head_as_list(%@me{} = me, row_titles) when is_list(row_titles) do
+    head_list =  Map.keys(me.col_sum)
+    lst = 
+      for head <- head_list do
+        Tuple.to_list(head) |> Enum.join("-") 
+      end
+
+    row_titles ++ lst ++ ["Total"]
   end
 
   def footer_as_list(%@me{} = me) do
@@ -168,16 +181,17 @@ defmodule PiviEx do
   end
   defp data do
     [
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: nil},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: nil},
+      %{company_id: 1, gender: "f", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 2, gender: "f", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
     ]
   end
   def test2() do
     data()
     |> pivot(fn r -> {r.company_id, r.account_id} end,
-             fn r -> {Period.period(r.date)} end,
+             fn r -> {Period.period(r.date), r.gender} end,
              fn r -> r.amount end)
   end
     
