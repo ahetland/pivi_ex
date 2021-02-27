@@ -80,6 +80,7 @@ defmodule PiviEx do
 
   @doc """
   Returns the header for the calculated elements.
+  Optionally add a list of titles to the row elements.
   """
   def head_as_list(%@me{} = me) do
     head_list =  Map.keys(me.col_sum)
@@ -154,6 +155,11 @@ defmodule PiviEx do
 
   def as_map(%@me{} = me) do
     elements_as_map(me) ++ [footer_as_list(me)]
+  end
+
+  def filter(%@me{data: data}, func) do
+    Enum.filter(data, func)
+    |> new()
   end
 
   def test(data) do
