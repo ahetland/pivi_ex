@@ -6,6 +6,11 @@ defmodule PiviEx do
   Creates a pivot table from a list.
 
   The strcut holds its original data in the data attribute.
+
+    data
+    |> pivot(fn r -> {r.company_id, r.account_id} end,
+             fn r -> {Period.period(r.date)} end,
+             fn r -> Decimal.sub(r.debit, r.credit) end)
   """
 
   @me __MODULE__
@@ -30,7 +35,6 @@ defmodule PiviEx do
              fn r -> {Period.period(r.date)} end,
              fn r -> Decimal.sub(r.debit, r.credit) end)
   """
-
   def pivot(%@me{data: data} = _pi, row, col, amount) do
     _pivot(data, row, col, amount, new(data))
   end
@@ -160,6 +164,40 @@ defmodule PiviEx do
   def filter(%@me{data: data}, func) do
     Enum.filter(data, func)
     |> new()
+  end
+
+  @doc """
+  Export the data to a CSV list by providing a list of field atoms
+  converts the underlying data to list.
+  Usage:
+  
+  csv = 
+    %PiviEx{}
+    |> to_csv()
+
+  File.wite("/tmp/example.csv", csv)
+  """
+  def to_csv(%@me{data: data}, header) do
+    data
+    |> Enum.reduce([header], fn d, acc ->
+                          row = Enum.map(header, fn h ->
+                                                  Map.get(d, h) 
+                                                  end)
+                          [row | acc] 
+    end)
+    |> Enum.reverse()
+    |> CSV.encode()
+    |> Enum.to_list()
+
+  end
+  def to_csv(%@me{data: data} = me) do
+    header = hd(data) |> Map.keys()
+    to_csv(me, header)
+  end
+
+  def csv_test() do
+    test2()
+    |> to_csv([:company_id, :amount])
   end
 
   def test(data) do
