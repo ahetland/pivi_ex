@@ -200,36 +200,75 @@ defmodule PiviEx do
     |> to_csv([:company_id, :amount])
   end
 
-  def test(data) do
-    data
-    |> pivot(fn r -> {r.company_id, r.account_id} end,
+  def test() do
+    data2()
+    |> pivot(fn r -> {r.account_id, r.company_id} end,
              fn r -> {Period.period(r.date)} end,
              fn r -> Decimal.sub(r.debit, r.credit) end)
-    
   end
 
-  def test() do
-    data = [
-      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-07-05], debit: Decimal.new(10), credit: Decimal.new(0)},
-      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], debit: Decimal.new(10), credit: Decimal.new(0)},
-      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], debit: 0, credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
-      %{company_id: 2, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(10), credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], debit: Decimal.new(8), credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], debit: Decimal.new(8), credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], debit: Decimal.new(8), credit: Decimal.new(0)},
-      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], debit: Decimal.new(8), credit: Decimal.new(0)},
-    ]
-    test(data)
+  def test3() do
+    test()
+
+    data2()
+    |> pivot(fn r -> {r.account_id, nil} end,
+             fn r -> {Period.period(r.date)} end,
+             fn r -> Decimal.sub(r.debit, r.credit) end)
   end
+
+  @doc """
+  Combine two Pivis to create list with sub totals
+
+  Create two Pivis with same size and join them.
+  """
+  def test_combine() do
+    a = PiviEx.test3 |> PiviEx.elements_as_map
+    b = PiviEx.test |> PiviEx.elements_as_map
+    (a ++ b) |> Enum.sort()
+  end
+
   defp data do
     [
-      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
-      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: nil},
-      %{company_id: 1, gender: "f", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
-      %{company_id: 1, gender: "m", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
-      %{company_id: 2, gender: "f", account_id: "Acc. #1", date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: nil},
+      %{company_id: 1, gender: "f", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 2, gender: "f", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+    ]
+  end
+  defp data2 do
+    [
+      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 3, account_id: "Acc. #2", date: ~D[2020-03-05], 
+        debit: 0, credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 2, account_id: "Acc. #1", date: ~D[2020-05-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-03-05], 
+        debit: Decimal.new("10.7"), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-05-05], 
+        debit: Decimal.new(8), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], 
+        debit: Decimal.new(8), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], 
+        debit: Decimal.new(8), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-06-05], 
+        debit: Decimal.new(8), credit: Decimal.new(0)},
+      %{company_id: 1, account_id: "Acc. #1", date: ~D[2020-03-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
+      %{company_id: 2, account_id: "Acc. #1", date: ~D[2020-03-05], 
+        debit: Decimal.new(10), credit: Decimal.new(0)},
     ]
   end
   def test2() do
