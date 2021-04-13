@@ -186,7 +186,7 @@ defmodule PiviEx do
                           [row | acc] 
     end)
     |> Enum.reverse()
-    |> CSV.encode()
+    |> CSV.encode(separator: ?;)
     |> Enum.to_list()
 
   end
