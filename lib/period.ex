@@ -165,6 +165,7 @@ defmodule PiviEx.Period do
   end
 
   def yield_periods(start_period, end_period) do
+    raise("crap")
     start_year = div(start_period, 100)
     start_month = rem(start_period, 100)
     start_year_dec = start_year * 100 + 12
@@ -183,4 +184,17 @@ defmodule PiviEx.Period do
 
     Enum.map(start_period..start_year_dec, & &1) ++ Enum.map(end_year_jan..end_period, & &1)
   end
+
+  def from_quarter(quarter) when is_binary(quarter) do
+    [year, quarter] = String.split(quarter, "-")
+    year = String.to_integer(year) * 100
+    cond do
+      quarter=="Q1" -> (year + 1)..(year + 3)
+      quarter=="Q2" -> (year + 4)..(year + 6)
+      quarter=="Q3" -> (year + 7)..(year + 9)
+      quarter=="Q4" -> (year + 10)..(year + 12)
+      true -> :error
+    end
+  end
+
 end
