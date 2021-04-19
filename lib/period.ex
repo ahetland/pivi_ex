@@ -185,15 +185,27 @@ defmodule PiviEx.Period do
     Enum.map(start_period..start_year_dec, & &1) ++ Enum.map(end_year_jan..end_period, & &1)
   end
 
+  def from_quarter(quarter) when is_integer(quarter), do: quarter
   def from_quarter(quarter) when is_binary(quarter) do
-    [year, quarter] = String.split(quarter, "-")
-    year = String.to_integer(year) * 100
-    cond do
-      quarter=="Q1" -> (year + 1)..(year + 3)
-      quarter=="Q2" -> (year + 4)..(year + 6)
-      quarter=="Q3" -> (year + 7)..(year + 9)
-      quarter=="Q4" -> (year + 10)..(year + 12)
-      true -> :error
+    if String.contains?(quarter, "-") do
+      [year, quarter] = String.split(quarter, "-")
+
+      {year, quarter} = 
+        if String.contains?(year, "Q") do
+          {String.to_integer(quarter) * 100, year}
+        else
+          {String.to_integer(year) * 100, quarter}
+        end
+
+      cond do
+        quarter=="Q1" -> {:ok, (year + 1)..(year + 3)}
+        quarter=="Q2" -> {:ok, (year + 4)..(year + 6)}
+        quarter=="Q3" -> {:ok, (year + 7)..(year + 9)}
+        quarter=="Q4" -> {:ok, (year + 10)..(year + 12)}
+        true -> {:error, quarter}
+      end
+    else
+        {:error, quarter}
     end
   end
 

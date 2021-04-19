@@ -97,7 +97,7 @@ defmodule PiviEx do
   end
 
   def head_as_list(%@me{} = me, row_titles) when is_list(row_titles) do
-    head_list =  Map.keys(me.col_sum)
+    head_list =  Map.keys(me.col_sum) |> Enum.sort()
     lst = 
       for head <- head_list do
         Tuple.to_list(head) |> Enum.join("-") 
@@ -107,7 +107,7 @@ defmodule PiviEx do
   end
 
   def footer_as_list(%@me{} = me) do
-    head_list =  Map.keys(me.col_sum)
+    head_list =  Map.keys(me.col_sum) |> Enum.sort()
     lst = 
       for head <- head_list do
         Map.get(me.col_sum, head, Decimal.new(0))
@@ -116,7 +116,7 @@ defmodule PiviEx do
   end
     
   defp row_as_list(%@me{} = me, row) do
-    head_list =  Map.keys(me.col_sum)
+    head_list =  Map.keys(me.col_sum) |> Enum.sort()
     lst = 
       for head <- head_list do
         Map.get(me.element, {row, head}, Decimal.new(0))
@@ -126,7 +126,7 @@ defmodule PiviEx do
   end
 
   defp row_as_map(%@me{} = me, row) do
-    head_list =  Map.keys(me.col_sum)
+    head_list =  Map.keys(me.col_sum) |> Enum.sort()
     lst = 
       for head <- head_list do
         v = Map.get(me.element, {row, head}, Decimal.new(0))
@@ -137,7 +137,7 @@ defmodule PiviEx do
   end
 
   def elements_as_list(%@me{} = me) do
-    row_list =  Map.keys(me.row_sum)
+    row_list =  Map.keys(me.row_sum) |> Enum.sort()
 
     for row <- row_list do
       row_as_list(me, row)
@@ -145,7 +145,7 @@ defmodule PiviEx do
   end
 
   def elements_as_map(%@me{} = me) do
-    row_list =  Map.keys(me.row_sum)
+    row_list =  Map.keys(me.row_sum) |> Enum.sort()
 
     for row <- row_list do
       row_as_map(me, row)
