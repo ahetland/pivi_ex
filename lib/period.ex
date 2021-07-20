@@ -230,4 +230,18 @@ defmodule PiviEx.Period do
     end
   end
 
+  def to_quarter(period) when is_integer(period) do
+    y = div(period, 100)
+    m = rem(period, 100)
+
+    cond do 
+      m in 1..3 -> "#{y}-Q1"
+      m in 4..6 -> "#{y}-Q2"
+      m in 7..9 -> "#{y}-Q3"
+      m in 10..12 -> "#{y}-Q4"
+      true -> raise("Error in period calculation for quarter")
+    end
+  end
+
+
 end
