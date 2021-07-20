@@ -143,7 +143,7 @@ defmodule PiviEx.Period do
     name(String.to_integer(p))
   end
 
-  def name(period) when period > 190_000 and period < 205_000 do
+  def name(:de, period) when period > 190_000 and period < 205_000 do
     year = div(period, 100)
     month = rem(period, 100)
 
@@ -160,6 +160,27 @@ defmodule PiviEx.Period do
       10 -> "Okt-#{year}"
       11 -> "Nov-#{year}"
       12 -> "Dez-#{year}"
+      _ -> :error
+    end
+  end
+
+  def name(:us, period) when period > 190_000 and period < 205_000 do
+    year = div(period, 100)
+    month = rem(period, 100)
+
+    case month do
+      1 -> "January #{year}"
+      2 -> "February #{year}"
+      3 -> "March #{year}"
+      4 -> "April #{year}"
+      5 -> "May #{year}"
+      6 -> "June #{year}"
+      7 -> "July #{year}"
+      8 -> "August #{year}"
+      9 -> "September #{year}"
+      10 -> "October #{year}"
+      11 -> "November #{year}"
+      12 -> "December #{year}"
       _ -> :error
     end
   end
