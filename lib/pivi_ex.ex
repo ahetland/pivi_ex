@@ -77,18 +77,18 @@ defmodule PiviEx do
     _pivot(t, row, col, amount, stu)
   end
 
-  defp _pivot([h | t], row, col, amount, stu) do
-    row_h = row.(h)
-    col_h = col.(h)
-    amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
-
-    calculate_element = 
-      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
-
-    stu = Map.put(stu, :element, calculate_element)
-
-    _pivot(t, row, col, amount, stu)
-  end
+#  defp _pivot([h | t], row, col, amount, stu) do
+#    row_h = row.(h)
+#    col_h = col.(h)
+#    amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
+#
+#    calculate_element = 
+#      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
+#
+#    stu = Map.put(stu, :element, calculate_element)
+#
+#    _pivot(t, row, col, amount, stu)
+#  end
 
   defp empty_table_cells(%@me{} = me) do
     hd(Map.keys(me.row_sum))
