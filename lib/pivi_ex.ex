@@ -64,9 +64,9 @@ defmodule PiviEx do
   end
 
   #this branch allows for passing a row and column tuple instead of a function
-  defp _pivot([h | t], row, col, amount, stu) when is_tuple(row) and is_tuple(col) do
-    row_h = build_piv(h, row)
-    col_h = build_piv(h, col)
+  defp _pivot([h | t], row, col, amount, stu) do
+    row_h = build_piv(h, row) || row.(h)
+    col_h = build_piv(h, col) || col.(h)
     amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
 
     calculate_element = 
@@ -112,7 +112,8 @@ defmodule PiviEx do
     {Map.get(r, a), Map.get(r, b), Map.get(r, c), Map.get(r, d), Map.get(r, e)}
   end
   defp build_piv(r, _) do
-    {:error, "max in tuple"}
+#    {:error, "max in tuple"}
+    false
   end
 
   @doc """
