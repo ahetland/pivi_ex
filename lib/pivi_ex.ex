@@ -63,6 +63,20 @@ defmodule PiviEx do
     %{stu | col_sum: col_sum, row_sum: row_sum, total: total}
   end
 
+  #this branch allows for passing a row and column tuple instead of a function
+  defp _pivot([h | t], row, col, amount, stu) when is_tuple(row) and is_tuple(col) do
+    row_h = build_piv(h, row)
+    col_h = build_piv(h, col)
+    amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
+
+    calculate_element = 
+      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
+
+    stu = Map.put(stu, :element, calculate_element)
+
+    _pivot(t, row, col, amount, stu)
+  end
+
   defp _pivot([h | t], row, col, amount, stu) do
     row_h = row.(h)
     col_h = col.(h)
@@ -80,6 +94,25 @@ defmodule PiviEx do
     hd(Map.keys(me.row_sum))
     |> Tuple.to_list()
     |> Enum.map(fn _ -> nil end)
+  end
+
+  defp build_piv(r, {a}) do
+    {Map.get(r, a)}
+  end
+  defp build_piv(r, {a, b}) do
+    {Map.get(r, a), Map.get(r, b)}
+  end
+  defp build_piv(r, {a, b, c}) do
+    {Map.get(r, a), Map.get(r, b), Map.get(r, c)}
+  end
+  defp build_piv(r, {a, b, c, d}) do
+    {Map.get(r, a), Map.get(r, b), Map.get(r, c), Map.get(r, d)}
+  end
+  defp build_piv(r, {a, b, c, d, e}) do
+    {Map.get(r, a), Map.get(r, b), Map.get(r, c), Map.get(r, d), Map.get(r, e)}
+  end
+  defp build_piv(r, _) do
+    {:error, "max in tuple"}
   end
 
   @doc """

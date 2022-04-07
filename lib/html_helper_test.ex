@@ -1,5 +1,5 @@
 ExUnit.start
-Code.require_file("html_helper.ex", __DIR__)
+#Code.require_file("html_helper.ex", __DIR__)
 
 defmodule PiviEx.HtmlHelperTest do
 
