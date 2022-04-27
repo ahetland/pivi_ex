@@ -22,12 +22,17 @@ defmodule PiviEx do
     row_sum: %{},
     col_sum: %{},
     element: %{},
-    total: nil
+    total: nil,
+    info: nil,
   )
 
   def new(data) do
   	%@me{data: data}
   end
+  def new(data, info) do
+  	%@me{data: data, info: info}
+  end
+
 
   @doc """
     data
@@ -35,8 +40,8 @@ defmodule PiviEx do
              fn r -> {Period.period(r.date)} end,
              fn r -> Decimal.sub(r.debit, r.credit) end)
   """
-  def pivot(%@me{data: data} = _pi, row, col, amount) do
-    _pivot(data, row, col, amount, new(data))
+  def pivot(%@me{data: data, info: info} = _pi, row, col, amount) do
+    _pivot(data, row, col, amount, new(data, info))
   end
 
   def pivot(lst, row, col, amount) when is_list(lst) do
@@ -195,9 +200,9 @@ defmodule PiviEx do
     elements_as_map(me) ++ [footer_as_list(me)]
   end
 
-  def filter(%@me{data: data}, func) do
+  def filter(%@me{data: data, info: info}, func) do
     Enum.filter(data, func)
-    |> new()
+    |> new(info)
   end
 
   @doc """
