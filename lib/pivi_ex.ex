@@ -206,6 +206,30 @@ defmodule PiviEx do
   end
 
   @doc """
+  Get the result of an element in the pivot table.
+
+  When there is only one kw in the list then return the matching element.
+  """
+  def get(%@me{data: data} = me, opts) do
+
+    data
+    |> Enum.map(fn r -> map_a_kwl_to_map(opts, r) end)
+    |> Enum.filter(& &1)
+  end
+
+  defp map_a_kwl_to_map([h], elem_map) do
+    {k, v} = h
+    if Map.get(elem_map, k) == v, do: elem_map
+  end
+  defp map_a_kwl_to_map([h | t], elem_map) do
+    {k, v} = h
+    if Map.get(elem_map, k) == v do
+      map_a_kwl_to_map(t, elem_map)
+    end
+  end
+
+
+  @doc """
   Export the data to a CSV list by providing a list of field atoms
   converts the underlying data to list.
   Usage:
@@ -277,6 +301,8 @@ defmodule PiviEx do
       %{company_id: 1, gender: "m", account_id: "Acc. #1", 
         date: ~D[2020-06-05], amount: Decimal.new(15)},
       %{company_id: 2, gender: "f", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 2, gender: "f", account_id: "Acc. #2", 
         date: ~D[2020-06-05], amount: Decimal.new(15)},
     ]
   end
