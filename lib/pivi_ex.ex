@@ -227,6 +227,24 @@ defmodule PiviEx do
       map_a_kwl_to_map(t, elem_map)
     end
   end
+  
+  @doc """
+  Get the result of an element in the pivot table and 
+  sum these with the field provided in summation_field.
+  """
+  def get_and_sum(%@me{data: data} = me, summation_field, opts) do
+    filtered_records = get(me, opts)
+    Enum.reduce(filtered_records, Decimal.new(0), 
+      fn r, acc -> get_and_sum_adder(r, acc, summation_field) end)
+  end
+  defp get_and_sum_adder(r, acc, summation_field) do
+    val = 
+      case Map.get(r, summation_field) do
+        nil -> Decimal.new(0)
+        x -> x
+      end
+    Decimal.add(val, acc)
+  end
 
 
   @doc """
