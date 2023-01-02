@@ -26,6 +26,13 @@ defmodule PiviEx do
     info: nil,
   )
 
+  def new({:ok, %{rows: rows, columns: columns}}) do
+    data = 
+      Enum.map(rows, fn r -> 
+          Enum.zip(columns, r) |> Enum.into(%{}) end)
+    %@me{data: data}
+  end
+
   def new(data) do
   	%@me{data: data}
   end
