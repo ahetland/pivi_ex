@@ -27,6 +27,7 @@ defmodule PiviEx do
   )
 
   def new({:ok, %{rows: rows, columns: columns}}) do
+    columns = Enum.map(columns, &String.to_atom/1)
     data = 
       Enum.map(rows, fn r -> 
           Enum.zip(columns, r) |> Enum.into(%{}) end)
@@ -268,10 +269,9 @@ defmodule PiviEx do
   def to_csv(%@me{data: data}, header) do
     data
     |> Enum.reduce([header], fn d, acc ->
-                          row = Enum.map(header, fn h ->
-                                                  Map.get(d, h) 
-                                                  end)
-                          [row | acc] 
+      row = Enum.map(header, fn h ->
+        Map.get(d, h) end)
+      [row | acc] 
     end)
     |> Enum.reverse()
     |> CSV.encode(separator: ?;)
