@@ -238,16 +238,32 @@ defmodule PiviEx do
   
   @doc """
   Get the result of an element in the pivot table and 
-  sum these with the field provided in summation_field.
+  sum these with the field provided in summation_field
+  or calculated from a function.
+
+  Example:
+
+  PiviEx.get_and_sum(p, 
+      :debit, [account_id: "Acc. #1", company_id: 1])
+
+  PiviEx.get_and_sum(p, 
+    fn r -> Decimal.mult(r.debit, r.credit) end, 
+    [account_id: "Acc. #1", company_id: 1])
+
   """
-  def get_and_sum(%@me{data: data} = me, summation_field, opts) do
+  def get_and_sum(%@me{} = me, sum_fn, opts) when is_function(sum_fn) do
+    get(me, opts)
+    |> Enum.reduce(Decimal.new(0), fn r, acc -> Decimal.add(sum_fn.(r), acc) end)
+  end
+
+  def get_and_sum(%@me{} = me, s_field, opts) when is_atom(s_field) do
     filtered_records = get(me, opts)
     Enum.reduce(filtered_records, Decimal.new(0), 
-      fn r, acc -> get_and_sum_adder(r, acc, summation_field) end)
+      fn r, acc -> get_and_sum_adder(r, acc, s_field) end)
   end
-  defp get_and_sum_adder(r, acc, summation_field) do
+  defp get_and_sum_adder(r, acc, s_field) do
     val = 
-      case Map.get(r, summation_field) do
+      case Map.get(r, s_field) do
         nil -> Decimal.new(0)
         x -> x
       end
