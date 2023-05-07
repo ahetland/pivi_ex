@@ -304,6 +304,9 @@ defmodule PiviEx do
     |> to_csv([:company_id, :amount])
   end
 
+  def empty?(%@me{data: []}), do: true
+  def empty?(%@me{}), do: false
+
   def test() do
     data2()
     |> pivot(fn r -> {r.account_id, r.company_id} end,
