@@ -26,6 +26,9 @@ defmodule PiviEx do
     info: nil,
   )
 
+  @doc """
+  Create a new Pivi from postgres query.
+  """
   def new({:ok, %{rows: rows, columns: columns}}) do
     columns = Enum.map(columns, &String.to_atom/1)
     data = 
@@ -34,6 +37,17 @@ defmodule PiviEx do
     %@me{data: data}
   end
 
+  @doc """
+  Create a new Pivi from existing Pivi using only the elements.
+  This is usefull to manipulate a smaller dataset.
+  """
+  def new(%@me{element: element} = me) do
+  	IO.inspect element
+  end
+
+  @doc """
+  Create a new Pivi.
+  """
   def new(data) do
   	%@me{data: data}
   end
@@ -59,16 +73,18 @@ defmodule PiviEx do
   defp _pivot([], _row, _col, _amount, stu) do
     col_sum = 
       stu.element
-      |> Enum.reduce(%{}, fn {{_, col}, amount}, acc -> 
-                            Map.update(acc, col, amount, &(Decimal.add(&1, amount))) 
-                          end
+      |> Enum.reduce(%{}, 
+        fn {{_, col}, amount}, acc -> 
+          Map.update(acc, col, amount, &(Decimal.add(&1, amount))) 
+        end
       )
 
     row_sum = 
       stu.element
-      |> Enum.reduce(%{}, fn {{row, _}, amount}, acc -> 
-                            Map.update(acc, row, amount, &(Decimal.add(&1, amount))) 
-                          end
+      |> Enum.reduce(%{}, 
+        fn {{row, _}, amount}, acc -> 
+          Map.update(acc, row, amount, &(Decimal.add(&1, amount))) 
+        end
       )
 
     total = Enum.reduce(Map.values(col_sum), 0, &(Decimal.add(&1, &2)))
