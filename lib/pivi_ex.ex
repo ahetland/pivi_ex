@@ -21,6 +21,9 @@ defmodule PiviEx do
     data: nil,
     row_sum: %{},
     col_sum: %{},
+    col_name: nil,
+    row_name: nil,
+    amount_name: nil,
     element: %{},
     total: nil,
     info: nil,
@@ -41,8 +44,9 @@ defmodule PiviEx do
   Create a new Pivi from existing Pivi using only the elements.
   This is usefull to manipulate a smaller dataset.
   """
-  def new(%@me{element: element} = me) do
+  def new(%@me{element: element} = me, row_name, col_name, amount_name) do
   	IO.inspect element
+    
   end
 
   @doc """
@@ -94,30 +98,19 @@ defmodule PiviEx do
 
   #this branch allows for passing a row and column tuple instead of a function
   defp _pivot([h | t], row, col, amount, stu) do
+
     row_h = build_piv(h, row) || row.(h)
     col_h = build_piv(h, col) || col.(h)
     amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
 
     calculate_element = 
-      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
+      Map.update(stu.element, 
+        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
 
     stu = Map.put(stu, :element, calculate_element)
 
     _pivot(t, row, col, amount, stu)
   end
-
-#  defp _pivot([h | t], row, col, amount, stu) do
-#    row_h = row.(h)
-#    col_h = col.(h)
-#    amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
-#
-#    calculate_element = 
-#      Map.update(stu.element, {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
-#
-#    stu = Map.put(stu, :element, calculate_element)
-#
-#    _pivot(t, row, col, amount, stu)
-#  end
 
   defp empty_table_cells(%@me{} = me) do
     hd(Map.keys(me.row_sum))
