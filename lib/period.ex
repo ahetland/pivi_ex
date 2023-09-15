@@ -45,9 +45,13 @@ defmodule PiviEx.Period do
   end
 
   def last_years_period(period) when is_integer(period) do
-    year = div(period, 100)
-    month = rem(period, 100)
-    (year - 1) * 100 + month
+    cond do
+      period > 190100 ->
+        year = div(period, 100)
+        month = rem(period, 100)
+        (year - 1) * 100 + month
+      period < 9999 -> period - 1
+    end
   end
 
   def period_valid?(period) do
