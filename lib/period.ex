@@ -50,6 +50,17 @@ defmodule PiviEx.Period do
     (year - 1) * 100 + month
   end
 
+  def period_valid?(period) do
+    year = div(period, 100)
+    month = rem(period, 100)
+    cond do
+      year < 1999 || year > 2099 -> false
+      month < 0 || month > 12 -> false
+      true -> true
+    end
+  end
+
+
   def period_dates(int) when int > 1900 and int < 2030 do
     {:ok, first_date} = Date.new(int, 1, 1)
     {:ok, last_date} = Date.new(int, 12, 31)
