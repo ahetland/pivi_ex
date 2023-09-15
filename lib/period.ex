@@ -25,6 +25,30 @@ defmodule PiviEx.Period do
     {:ok, last_date} = Date.new(year, month, Date.days_in_month(first_date))
     {:ok, first_date, last_date}
   end
+  
+  @doc """
+  Given a year in int returns the first month and last month 
+  for that year.
+
+  Example year_firstmonth_lastmonth(2023)
+  >> {202301, 202312}
+  """
+  def year_firstmonth_lastmonth(year) when is_integer(year) do
+    {year * 100 + 1, year * 100 + 12}
+  end
+
+  @doc """
+  Returns the range of periods in a year.
+  """
+  def year_range(year) when is_integer(year) do
+    year * 100 + 1..year * 100 + 12 
+  end
+
+  def last_years_period(period) when is_integer(period) do
+    year = div(period, 100)
+    month = rem(period, 100)
+    (year - 1) * 100 + month
+  end
 
   def period_dates(int) when int > 1900 and int < 2030 do
     {:ok, first_date} = Date.new(int, 1, 1)
