@@ -37,6 +37,15 @@ defmodule PiviEx.Period do
     {year * 100 + 1, year * 100 + 12}
   end
 
+  def zero_month_of_period(period) when is_binary(period) do
+    String.to_integer(period)
+    |> zero_month_of_period()
+  end
+  def zero_month_of_period(period) when is_integer(period) do
+    year = div(period, 100)
+    year * 100
+  end
+
   @doc """
   Returns the range of periods in a year.
   """
