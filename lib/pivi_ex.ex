@@ -396,6 +396,14 @@ defmodule PiviEx do
              fn r -> r.amount end)
   end
     
+  def test3() do
+    data()
+    |> pivot(
+      fn r -> {r.company_id, r.account_id} end,
+      fn r -> {Period.period(r.date), r.gender} end,
+      fn r -> r.amount * 2 end
+    )
+  end
 
 end
 
