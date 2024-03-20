@@ -101,11 +101,15 @@ defmodule PiviEx do
 
     row_h = build_piv(h, row) || row.(h)
     col_h = build_piv(h, col) || col.(h)
+    #below is if you receive bad data - nil - but the functionality
+    #stops for other possible usage so its commented out
     amount_h = if amount.(h)==nil, do: Decimal.new(0), else: amount.(h)
 
     calculate_element = 
       Map.update(stu.element, 
-        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
+    #    {row_h, col_h}, amount.(h), &(Decimal.add(&1, amount.(h))))
+        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount.(h))))
+    #    {row_h, col_h}, Decimal.new(0), &(Decimal.add(&1, amount.(h))))
 
     stu = Map.put(stu, :element, calculate_element)
 
