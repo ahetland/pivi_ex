@@ -26,6 +26,12 @@ defmodule PiviEx.Period do
     {:ok, first_date, last_date}
   end
   
+  def period_dates(int) when int > 1900 and int < 2030 do
+    {:ok, first_date} = Date.new(int, 1, 1)
+    {:ok, last_date} = Date.new(int, 12, 31)
+    {:ok, first_date, last_date}
+  end
+
   @doc """
   Given a year in int returns the first month and last month 
   for that year.
@@ -71,13 +77,6 @@ defmodule PiviEx.Period do
       month < 0 || month > 12 -> false
       true -> true
     end
-  end
-
-
-  def period_dates(int) when int > 1900 and int < 2030 do
-    {:ok, first_date} = Date.new(int, 1, 1)
-    {:ok, last_date} = Date.new(int, 12, 31)
-    {:ok, first_date, last_date}
   end
 
   @doc """

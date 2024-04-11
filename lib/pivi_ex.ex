@@ -26,11 +26,12 @@ defmodule PiviEx do
     amount_name: nil,
     element: %{},
     total: nil,
-    info: nil,
+    info: nil
   )
 
   @doc """
   Create a new Pivi from postgres query.
+  Or from a list.
   """
   def new({:ok, %{rows: rows, columns: columns}}) do
     columns = Enum.map(columns, &String.to_atom/1)
@@ -40,23 +41,21 @@ defmodule PiviEx do
     %@me{data: data}
   end
 
-  @doc """
-  Create a new Pivi from existing Pivi using only the elements.
-  This is usefull to manipulate a smaller dataset.
-  """
-  def new(%@me{element: element} = me, row_name, col_name, amount_name) do
-  	IO.inspect element
-    
-  end
-
-  @doc """
-  Create a new Pivi.
-  """
   def new(data) do
   	%@me{data: data}
   end
   def new(data, info) do
   	%@me{data: data, info: info}
+  end
+
+  @doc """
+  Create a new Pivi from existing Pivi using only the elements.
+  This is usefull to manipulate a smaller dataset.
+  """
+  def new(%@me{element: element} = _me, _row_name, _col_name, _amount_name) do
+  	IO.inspect element
+    raise "must be deprectaed"
+    
   end
 
 
@@ -108,7 +107,7 @@ defmodule PiviEx do
     calculate_element = 
       Map.update(stu.element, 
     #    {row_h, col_h}, amount.(h), &(Decimal.add(&1, amount.(h))))
-        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount.(h))))
+        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
     #    {row_h, col_h}, Decimal.new(0), &(Decimal.add(&1, amount.(h))))
 
     stu = Map.put(stu, :element, calculate_element)
@@ -137,7 +136,7 @@ defmodule PiviEx do
   defp build_piv(r, {a, b, c, d, e}) do
     {Map.get(r, a), Map.get(r, b), Map.get(r, c), Map.get(r, d), Map.get(r, e)}
   end
-  defp build_piv(r, _) do
+  defp build_piv(_r, _) do
 #    {:error, "max in tuple"}
     false
   end
@@ -185,6 +184,19 @@ defmodule PiviEx do
     Tuple.to_list(row) ++ lst ++ [Map.get(me.row_sum, row)]
   end
 
+  defp row_as_list2(%@me{} = me, row) do
+    #row_as_list2 is refactoring of first
+    #here I want to keep the keys as tuples
+    head_list =  Map.keys(me.col_sum) |> Enum.sort()
+    lst = 
+      for head <- head_list do
+        Map.get(me.element, {row, head}, Decimal.new(0))
+      end
+    #[row | lst ] ++ [Map.get(me.row_sum, row)]
+    #do not do to_list
+    [row | lst] ++ [Map.get(me.row_sum, row)]
+  end
+
   defp row_as_map(%@me{} = me, row) do
     head_list =  Map.keys(me.col_sum) |> Enum.sort()
     lst = 
@@ -201,6 +213,17 @@ defmodule PiviEx do
 
     for row <- row_list do
       row_as_list(me, row)
+    end
+  end
+
+  @doc """
+  in version2 I keep the row key as tuples
+  """
+  def elements_as_list2(%@me{} = me) do
+    row_list =  Map.keys(me.row_sum) |> Enum.sort()
+
+    for row <- row_list do
+      row_as_list2(me, row)
     end
   end
 
@@ -231,7 +254,7 @@ defmodule PiviEx do
 
   When there is only one kw in the list then return the matching element.
   """
-  def get(%@me{data: data} = me, opts) do
+  def get(%@me{data: data}, opts) do
 
     data
     |> Enum.map(fn r -> map_a_kwl_to_map(opts, r) end)
@@ -327,15 +350,6 @@ defmodule PiviEx do
              fn r -> Decimal.sub(r.debit, r.credit) end)
   end
 
-  def test3() do
-    test()
-
-    data2()
-    |> pivot(fn r -> {r.account_id, nil} end,
-             fn r -> {Period.period(r.date)} end,
-             fn r -> Decimal.sub(r.debit, r.credit) end)
-  end
-
   @doc """
   Combine two Pivis to create list with sub totals
 
@@ -359,6 +373,22 @@ defmodule PiviEx do
         date: ~D[2020-06-05], amount: Decimal.new(15)},
       %{company_id: 2, gender: "f", account_id: "Acc. #1", 
         date: ~D[2020-06-05], amount: Decimal.new(15)},
+      %{company_id: 2, gender: "f", account_id: "Acc. #2", 
+        date: ~D[2020-06-05], amount: Decimal.new(15)},
+    ]
+  end
+  defp data3 do
+    [
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(18)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: nil},
+      %{company_id: 1, gender: "f", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(150)},
+      %{company_id: 1, gender: "m", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new(1)},
+      %{company_id: 2, gender: "f", account_id: "Acc. #1", 
+        date: ~D[2020-06-05], amount: Decimal.new("2.8")},
       %{company_id: 2, gender: "f", account_id: "Acc. #2", 
         date: ~D[2020-06-05], amount: Decimal.new(15)},
     ]
@@ -399,6 +429,13 @@ defmodule PiviEx do
              fn r -> {Period.period(r.date), r.gender} end,
              fn r -> r.amount end)
   end
+  def test2_2() do
+    data3()
+    |> pivot(fn r -> {r.company_id, r.account_id} end,
+             fn r -> {Period.period(r.date), r.gender} end,
+             fn r -> r.amount end)
+  end
+    
     
   def test3() do
     data()
@@ -408,6 +445,13 @@ defmodule PiviEx do
       fn r -> r.amount * 2 end
     )
   end
+  def test4() do
+    test()
 
+    data2()
+    |> pivot(fn r -> {r.account_id, nil} end,
+             fn r -> {Period.period(r.date)} end,
+             fn r -> Decimal.sub(r.debit, r.credit) end)
+  end
 end
 

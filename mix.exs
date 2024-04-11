@@ -19,10 +19,10 @@ defmodule PiviEx.MixProject do
 
   defp deps do
     [
-#      {:csv, "~> 2.4"},
       {:csv, "~> 3.2"},
       {:uuid, "~> 1.1"},
-#      {:decimal, "~> 2.0"}
+      {:number, "~> 1.0"},
+      {:sneeze, "~> 2.0"},
       {:decimal, "~> 2.1"}
     ]
   end
