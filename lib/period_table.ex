@@ -12,10 +12,13 @@ defmodule PiviEx.PeriodTable do
     body: nil,
     footer: nil,
     header: nil,
+    head_list: nil,
     foot_title: "Total",
     css_table: %{class: "report"},
     css_tr: %{class: "tr-cls"},
     css_td: %{class: "td-right td-element"},
+    css_th_left: %{class: "css_th_left td-left font-bold-1 border-bottom"},
+    css_th_right: %{class: "css_th_right td-right font-bold-1 border-bottom"},
     css_td_left: %{class: "td-left"},
     css_map: %{
       {:key_of_the_row, :x} => %{class: "the css to use"}
@@ -25,6 +28,7 @@ defmodule PiviEx.PeriodTable do
   def new(%PiviEx{} = pivi, head_list) do
     %@me{pivi: pivi,
       body: PiviEx.elements_as_list2(pivi),
+      head_list: head_list,
       header: PiviEx.head_as_list(pivi, head_list),
       footer: PiviEx.footer_as_list(pivi)
     }
@@ -60,11 +64,13 @@ defmodule PiviEx.PeriodTable do
   end
 
   def thead(%@me{} = me) do
-    [:tr, 
+    [:tr,  
       Enum.map(me.header, fn h -> 
         cond do
           is_list(h) -> h
-          true -> [:td, %{class: "td-right font-bold border-bottom"}, h] 
+          Enum.any?(me.head_list, fn x -> x == h end) -> 
+            [:td, me.css_th_left, h] 
+          true -> [:td, me.css_th_right, h] 
         end
       end)
     ]
@@ -90,12 +96,6 @@ defmodule PiviEx.PeriodTable do
     Enum.zip(body_keys, body)
     |> Enum.map(fn {k, v} -> [:tr, me.css_tr, k ++ v] end)
 
-#    sorter = fn a, b ->
-#      a <= b end
-#
-#    Enum.sort(unsorted, fn [_, _, rest] ->
-#      sorter.(rest, rest) 
-#    end)
   end
 
   defp tfoot(%@me{} = me) do

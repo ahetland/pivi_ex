@@ -96,7 +96,7 @@ defmodule PiviEx.TwoTableDelta do
         [:td, %{class: "sum-line td-right italic font-bold"}, fmt(pc, 1)]]
       ]
 
-    head = [[:tr, %{class: "td-left"}, sz_th(me.head_row)]] 
+    head = [[:tr, %{class: "td-left border-bottom"}, sz_th(me.head_row)]] 
 
     [:table, %{class: "report"},
       head
