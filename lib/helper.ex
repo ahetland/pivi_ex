@@ -17,6 +17,7 @@ defmodule PiviEx.Helper do
   def fmt(_format, amount, precision) do
     Number.Delimit.number_to_delimited(amount, precision: precision)
   end
+
   def fmk(%Decimal{} = amount, precision) do
     Decimal.div(amount, 1000)
     |> fmt(precision)
@@ -28,5 +29,9 @@ defmodule PiviEx.Helper do
   def fmk(_format, %Decimal{} = amount, precision) do
     fmk(amount, precision)
   end
+  def fmb(%Decimal{} = amount, precision) do
+    Number.Delimit.number_to_delimited(amount, precision: precision)
+  end
+  def fmb(amount, precision), do: amount
 end
 
