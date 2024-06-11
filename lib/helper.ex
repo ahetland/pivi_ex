@@ -32,6 +32,6 @@ defmodule PiviEx.Helper do
   def fmb(%Decimal{} = amount, precision) do
     Number.Delimit.number_to_delimited(amount, precision: precision)
   end
-  def fmb(amount, precision), do: amount
+  def fmb(amount, _precision), do: amount
 end
 
