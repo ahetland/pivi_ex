@@ -63,7 +63,7 @@ defmodule PiviEx2 do
   def piv_fun_2(r) do
     ex = r.amount
     fn val_on_key -> 
-      [:td, [:a, m, x]] = val_on_key
+      [:td, [:a, _m, x]] = val_on_key
       y = Decimal.add(x, ex)
       [:td, [:a, %{href: "#{r["A"]}"}, y]]
     end
