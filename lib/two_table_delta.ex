@@ -108,7 +108,7 @@ defmodule PiviEx.TwoTableDelta do
   def footer(%@me{} = me) do
     [k, l, r, _ch, _pc] = 
       as_table(me)
-      |> List.zip()
+      |> Enum.zip()
 
     [l, r] = 
       Enum.map([l, r], fn t -> 
