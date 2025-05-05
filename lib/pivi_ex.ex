@@ -173,6 +173,10 @@ defmodule PiviEx do
       end
     empty_table_cells(me) ++ lst ++ [me.total]
   end
+  def footer_as_list(%@me{} = me, title) do
+    [h | rest] = footer_as_list(me)
+    [title | rest]
+  end
     
   defp row_as_list(%@me{} = me, row) do
     head_list =  Map.keys(me.col_sum) |> Enum.sort()
