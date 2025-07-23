@@ -174,7 +174,7 @@ defmodule PiviEx do
     empty_table_cells(me) ++ lst ++ [me.total]
   end
   def footer_as_list(%@me{} = me, title) do
-    [h | rest] = footer_as_list(me)
+    [_h | rest] = footer_as_list(me)
     [title | rest]
   end
     
