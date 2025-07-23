@@ -49,36 +49,36 @@ defmodule PiviEx do
   end
 
   @doc """
-  Create a new Pivi from existing Pivi using only the elements.
-  This is usefull to manipulate a smaller dataset.
-  """
-  def new(%@me{element: element} = _me, _row_name, _col_name, _amount_name) do
-  	IO.inspect element
-    raise "must be deprectaed"
-    
-  end
-
-
-  @doc """
     data
     |> pivot(fn r -> {r.company_id, r.account_id} end,
              fn r -> {Period.period(r.date)} end,
              fn r -> Decimal.sub(r.debit, r.credit) end)
+
+    Optionally you can add a 4 function that overrides
+    the default of adding decimals.
+    fn(a, b) -> Decimal.sub(a, b) end
   """
   def pivot(%@me{data: data, info: info} = _pi, row, col, amount) do
-    _pivot(data, row, col, amount, new(data, info))
+    add_decimal = fn (a, b) -> Decimal.add(a, b) end
+    _pivot(data, row, col, amount, new(data, info), add_decimal)
   end
-
   def pivot(lst, row, col, amount) when is_list(lst) do
-  	_pivot(lst, row, col, amount, new(lst))
+    add_decimal = fn (a, b) -> Decimal.add(a, b) end
+  	_pivot(lst, row, col, amount, new(lst), add_decimal)
+  end
+  def pivot(%@me{data: data, info: info} = _pi, row, col, amount, func) do
+    _pivot(data, row, col, amount, new(data, info), func)
+  end
+  def pivot(lst, row, col, amount, func) when is_list(lst) do
+  	_pivot(lst, row, col, amount, new(lst), func)
   end
 
-  defp _pivot([], _row, _col, _amount, stu) do
+  defp _pivot([], _row, _col, _amount, stu, func) do
     col_sum = 
       stu.element
       |> Enum.reduce(%{}, 
         fn {{_, col}, amount}, acc -> 
-          Map.update(acc, col, amount, &(Decimal.add(&1, amount))) 
+          Map.update(acc, col, amount, &func.(&1, amount)) 
         end
       )
 
@@ -86,17 +86,17 @@ defmodule PiviEx do
       stu.element
       |> Enum.reduce(%{}, 
         fn {{row, _}, amount}, acc -> 
-          Map.update(acc, row, amount, &(Decimal.add(&1, amount))) 
+          Map.update(acc, row, amount, &func.(&1, amount)) 
         end
       )
 
-    total = Enum.reduce(Map.values(col_sum), 0, &(Decimal.add(&1, &2)))
+    total = Enum.reduce(Map.values(col_sum), 0, &func.(&1, &2))
 
     %{stu | col_sum: col_sum, row_sum: row_sum, total: total}
   end
 
   #this branch allows for passing a row and column tuple instead of a function
-  defp _pivot([h | t], row, col, amount, stu) do
+  defp _pivot([h | t], row, col, amount, stu, func) do
 
     row_h = build_piv(h, row) || row.(h)
     col_h = build_piv(h, col) || col.(h)
@@ -106,13 +106,11 @@ defmodule PiviEx do
 
     calculate_element = 
       Map.update(stu.element, 
-    #    {row_h, col_h}, amount.(h), &(Decimal.add(&1, amount.(h))))
-        {row_h, col_h}, amount_h, &(Decimal.add(&1, amount_h)))
-    #    {row_h, col_h}, Decimal.new(0), &(Decimal.add(&1, amount.(h))))
+        {row_h, col_h}, amount_h, &func.(&1, amount_h))
 
     stu = Map.put(stu, :element, calculate_element)
 
-    _pivot(t, row, col, amount, stu)
+    _pivot(t, row, col, amount, stu, func)
   end
 
   defp empty_table_cells(%@me{} = me) do
@@ -351,7 +349,9 @@ defmodule PiviEx do
     data2()
     |> pivot(fn r -> {r.account_id, r.company_id} end,
              fn r -> {Period.period(r.date)} end,
-             fn r -> Decimal.sub(r.debit, r.credit) end)
+             fn r -> Decimal.sub(r.debit, r.credit) end, 
+             fn (a, b) -> Decimal.sub(a, b) end
+    )
   end
 
   @doc """
