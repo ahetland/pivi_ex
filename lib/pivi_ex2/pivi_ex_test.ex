@@ -36,7 +36,7 @@ defmodule PiviEx2.Test do
       fn a, b ->
         rev_a = Map.get(a, :revenue, Decimal.new(0))
         cost_a = Map.get(a, :cost, Decimal.new(0))
-        rev_b = Map.get(b, :revenue, Decimal.new(0))
+        #rev_b = Map.get(b, :revenue, Decimal.new(0))
         Map.update(b, :revenue, 
           rev_a, fn exis -> 
             Decimal.add(exis, rev_a) 
