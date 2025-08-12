@@ -97,7 +97,7 @@ defmodule PiviEx do
         case col_sum_hd do
           %Decimal{} = _col_sum_hd             -> Decimal.new(0)
           col_sum_hd when is_map(col_sum_hd)  -> %{}
-          true                                -> 0
+          _                                   -> 0
         end
       end
 
