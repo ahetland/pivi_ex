@@ -90,7 +90,20 @@ defmodule PiviEx do
         end
       )
 
-    total = Enum.reduce(Map.values(col_sum), 0, &func.(&1, &2))
+    col_sum_hd = Map.values(col_sum) |> hd()
+
+    acc = 
+      fn ->
+        case col_sum_hd do
+          %Decimal{} = col_sum_hd             -> Decimal.new(0)
+          col_sum_hd when is_map(col_sum_hd)  -> %{}
+          true                                -> 0
+        end
+      end
+
+    #total = Enum.reduce(Map.values(col_sum), 0, &func.(&1, &2))
+    #total = Enum.reduce(Map.values(col_sum), %{}, &func.(&1, &2))
+    total = Enum.reduce(Map.values(col_sum), acc.(), &func.(&1, &2))
 
     %{stu | col_sum: col_sum, row_sum: row_sum, total: total}
   end
