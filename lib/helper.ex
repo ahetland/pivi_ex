@@ -3,6 +3,14 @@ defmodule PiviEx.Helper do
   def fmt(amount) do
     Number.Delimit.number_to_delimited(amount, precision: 2)
   end
+  def fmt(:de, amount) do
+    kw = [
+      precision: 2,
+      delimiter: ".",
+      separator: ","
+    ]
+    Number.Delimit.number_to_delimited(amount, kw)
+  end
   def fmt(amount, precision) do
     Number.Delimit.number_to_delimited(amount, precision: precision)
   end
