@@ -378,6 +378,29 @@ defmodule PiviEx do
     (a ++ b) |> Enum.sort()
   end
 
+  @doc"""
+  Convert all the numbers in the pivot.
+  """
+  def convert_values(%@me{data: data}=pivi, fun) do
+    element = 
+      for {k, v} <- pivi.element, into: %{} do
+        {k, fun.(v)}
+      end
+
+    total = fun.(pivi.total)
+
+    col_sum = 
+      for {k, v} <- pivi.col_sum, into: %{} do
+        {k, fun.(v)}
+      end
+
+    row_sum = 
+      for {k, v} <- pivi.row_sum, into: %{} do
+        {k, fun.(v)}
+      end
+    %@me{data: data, element: element, col_sum: col_sum, row_sum: row_sum, total: total}
+  end
+
   defp data do
     [
       %{company_id: 1, gender: "m", account_id: "Acc. #1", 

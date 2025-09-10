@@ -10,6 +10,11 @@ defmodule PiviEx.Period do
     date
   end
 
+  def period(%NaiveDateTime{} = date) do
+    parse_naive(date)
+    |> period
+  end
+
   def period(%Date{} = date) do
     date.year * 100 + date.month
   end
