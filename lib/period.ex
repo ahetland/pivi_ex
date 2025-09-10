@@ -190,7 +190,8 @@ defmodule PiviEx.Period do
     name(String.to_integer(p))
   end
 
-  def name(:de, period) when period > 190_000 and period < 205_000 do
+  #def name(:de, period) when period > 190_000 and period < 205_000 do
+  def name(:de, period) do
     year = div(period, 100)
     month = rem(period, 100)
 
@@ -290,5 +291,9 @@ defmodule PiviEx.Period do
     end
   end
 
+  def parse_naive(nil), do: nil
+  def parse_naive(dt) do
+    NaiveDateTime.to_date(dt)
+  end
 
 end

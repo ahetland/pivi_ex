@@ -163,7 +163,7 @@ defmodule PiviEx do
         Tuple.to_list(head) |> Enum.join("-") 
       end
 
-    empty_table_cells(me) ++ lst ++ ["Total"]
+    empty_table_cells(me) ++ lst ++ ["Summe"]
   end
 
   def head_as_list(%@me{} = me, row_titles) when is_list(row_titles) do
@@ -173,7 +173,7 @@ defmodule PiviEx do
         Tuple.to_list(head) |> Enum.join("-") 
       end
 
-    row_titles ++ lst ++ ["Total"]
+    row_titles ++ lst ++ ["Summe"]
   end
 
   def footer_as_list(%@me{} = me) do
