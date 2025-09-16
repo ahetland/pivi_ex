@@ -381,6 +381,7 @@ defmodule PiviEx do
   @doc"""
   Convert all the numbers in the pivot.
   """
+  def convert_values([], _fun), do: []
   def convert_values(%@me{data: data}=pivi, fun) do
     element = 
       for {k, v} <- pivi.element, into: %{} do
@@ -399,6 +400,26 @@ defmodule PiviEx do
         {k, fun.(v)}
       end
     %@me{data: data, element: element, col_sum: col_sum, row_sum: row_sum, total: total}
+  end
+
+  @doc"""
+  Merge the element into the PiviEx.
+  """
+  def merge([], []), do: []
+  def merge(%@me{}=pivi, []), do: pivi
+  def merge([], %@me{}=pivi), do: pivi
+
+  def merge(%@me{element: el_me, row_sum: r_me}=pivi, %@me{element: el_other, row_sum: r_o}) do
+    new_el = Map.merge(el_me, el_other)
+    new_r = Map.merge(r_me, r_o)
+
+    Map.put(pivi, :element, new_el)
+    |> Map.put(:row_sum, new_r)
+  end
+  def merge(%@me{}=pivi, element_name, map) when is_map(map) do
+    el_me = Map.get(pivi, element_name)
+    new_el = Map.merge(el_me, map)
+    Map.put(pivi, element_name, new_el)
   end
 
   defp data do
