@@ -10,6 +10,7 @@ defmodule PiviEx.Period do
     date
   end
 
+  def period(nil), do: nil
   def period(%NaiveDateTime{} = date) do
     parse_naive(date)
     |> period
@@ -195,12 +196,12 @@ defmodule PiviEx.Period do
     name(String.to_integer(p))
   end
 
-  #def name(:de, period) when period > 190_000 and period < 205_000 do
   def name(:de, period) do
     year = div(period, 100)
     month = rem(period, 100)
 
     case month do
+      0 -> "01.01-#{year}"
       1 -> "Jan-#{year}"
       2 -> "Feb-#{year}"
       3 -> "Mrz-#{year}"
@@ -222,6 +223,7 @@ defmodule PiviEx.Period do
     month = rem(period, 100)
 
     case month do
+      0 -> "01.01-#{year}"
       1 -> "January #{year}"
       2 -> "February #{year}"
       3 -> "March #{year}"
