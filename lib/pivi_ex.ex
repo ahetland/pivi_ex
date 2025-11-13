@@ -1,5 +1,4 @@
 defmodule PiviEx do
-
   @moduledoc """
   Documentation for `PiviEx`.
 

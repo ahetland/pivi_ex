@@ -38,6 +38,11 @@ defmodule PiviEx.Period do
     {:ok, first_date, last_date}
   end
 
+  def period_dates_naive(int) do
+    {:ok, s, e} = period_dates(int)
+    {:ok, DateTime.new!(s, ~T[00:00:00]), DateTime.new!(e, ~T[00:00:00])}
+  end
+
   @doc """
   Given a year in int returns the first month and last month 
   for that year.
@@ -191,7 +196,7 @@ defmodule PiviEx.Period do
   end
 
   def name(str) when is_binary(str) do
-    [y, m, _d] = String.split(str, "-")
+    [y, m, _d] = String.split(str, " ")
     p = y <> m
     name(String.to_integer(p))
   end
@@ -201,19 +206,19 @@ defmodule PiviEx.Period do
     month = rem(period, 100)
 
     case month do
-      0 -> "01.01-#{year}"
-      1 -> "Jan-#{year}"
-      2 -> "Feb-#{year}"
-      3 -> "Mrz-#{year}"
-      4 -> "Apr-#{year}"
-      5 -> "Mai-#{year}"
-      6 -> "Jun-#{year}"
-      7 -> "Jul-#{year}"
-      8 -> "Aug-#{year}"
-      9 -> "Sep-#{year}"
-      10 -> "Okt-#{year}"
-      11 -> "Nov-#{year}"
-      12 -> "Dez-#{year}"
+      0 -> "01.01 #{year}"
+      1 -> "Jan #{year}"
+      2 -> "Feb #{year}"
+      3 -> "Mrz #{year}"
+      4 -> "Apr #{year}"
+      5 -> "Mai #{year}"
+      6 -> "Jun #{year}"
+      7 -> "Jul #{year}"
+      8 -> "Aug #{year}"
+      9 -> "Sep #{year}"
+      10 -> "Okt #{year}"
+      11 -> "Nov #{year}"
+      12 -> "Dez #{year}"
       _ -> :error
     end
   end
