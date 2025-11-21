@@ -332,6 +332,12 @@ defmodule PiviEx do
 
   File.wite("/tmp/example.csv", csv)
   """
+  def to_csv(data, file_path) when is_list(data) and is_binary(file_path) do
+    pivi = new(data)
+    h = Map.keys(hd(data))
+    csv = to_csv(pivi, h)
+    File.write("#{file_path}", csv)
+  end
   def to_csv(%@me{data: data}, header) do
     data
     |> Enum.reduce([header], fn d, acc ->
@@ -342,7 +348,6 @@ defmodule PiviEx do
     |> Enum.reverse()
     |> CSV.encode(separator: ?;)
     |> Enum.to_list()
-
   end
   def to_csv(%@me{data: data} = me) do
     header = hd(data) |> Map.keys()
