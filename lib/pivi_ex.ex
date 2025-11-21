@@ -18,6 +18,7 @@ defmodule PiviEx do
 
   defstruct(
     data: nil,
+    header: nil,
     row_sum: %{},
     col_sum: %{},
     col_name: nil,
@@ -37,14 +38,18 @@ defmodule PiviEx do
     data = 
       Enum.map(rows, fn r -> 
           Enum.zip(columns, r) |> Enum.into(%{}) end)
-    %@me{data: data}
+  	%@me{data: data, header: rows}
   end
 
   def new(data) do
-  	%@me{data: data}
+  	%@me{data: data, header: extract_header(data)}
   end
-  def new(data, info) do
-  	%@me{data: data, info: info}
+  def new(data, info, header) do
+  	%@me{data: data, info: info, header: header}
+  end
+
+  defp extract_header([%{} = h | _rest]) do
+    Map.keys(h)
   end
 
   @doc """
@@ -57,16 +62,16 @@ defmodule PiviEx do
     the default of adding decimals.
     fn(a, b) -> Decimal.sub(a, b) end
   """
-  def pivot(%@me{data: data, info: info} = _pi, row, col, amount) do
+  def pivot(%@me{data: data, info: info, header: header} = _pi, row, col, amount) do
     add_decimal = fn (a, b) -> Decimal.add(a, b) end
-    _pivot(data, row, col, amount, new(data, info), add_decimal)
+    _pivot(data, row, col, amount, new(data, info, header), add_decimal)
   end
   def pivot(lst, row, col, amount) when is_list(lst) do
     add_decimal = fn (a, b) -> Decimal.add(a, b) end
   	_pivot(lst, row, col, amount, new(lst), add_decimal)
   end
-  def pivot(%@me{data: data, info: info} = _pi, row, col, amount, func) do
-    _pivot(data, row, col, amount, new(data, info), func)
+  def pivot(%@me{data: data, info: info, header: header} = _pi, row, col, amount, func) do
+    _pivot(data, row, col, amount, new(data, info, header), func)
   end
   def pivot(lst, row, col, amount, func) when is_list(lst) do
   	_pivot(lst, row, col, amount, new(lst), func)
@@ -258,9 +263,9 @@ defmodule PiviEx do
     elements_as_map(me) ++ [footer_as_list(me)]
   end
 
-  def filter(%@me{data: data, info: info}, func) do
+  def filter(%@me{data: data, info: info, header: header}, func) do
     Enum.filter(data, func)
-    |> new(info)
+    |> new(info, header)
   end
 
   @doc """
